@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+       "ms-python.python",
+       "eamodio.gitlens",
+       "esbenp.prettier-vscode",
+       "vscode-icons-team.vscode-icons",
+       "CoenraadS.bracket-pair-colorizer",
+       "jebbs.plantuml",
+       "vscodevim.vim"
+    ]
+}

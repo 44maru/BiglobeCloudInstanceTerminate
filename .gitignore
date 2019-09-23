@@ -1,0 +1,9 @@
+.venv/
+.mypy_cache/
+__pycache__/
+.vscode/.ropeproject
+build/
+dist/
+log.txt
+inst_list.txt
+terminateBiglobeSrv.spec
