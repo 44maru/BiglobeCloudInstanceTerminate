@@ -17,8 +17,8 @@
     "python.linting.pylintEnabled": true,
     "python.linting.mypyEnabled": true,
     "python.linting.flake8Enabled": true,
-    "python.linting.pep8Enabled": true,
-    "python.linting.pep8Args": ["--ignore=E501"],
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pycodestyleArgs": ["--ignore=E501"],
     "python.linting.flake8Args": [
         "--max-line-length=88"
     ]

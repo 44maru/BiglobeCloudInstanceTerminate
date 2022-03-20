@@ -1,2 +1,6 @@
 [common]
-thread_num=30
+thread_num = 30
+
+[account]
+access_key_id = dummy_api_access_key
+access_key = dummy_encryption_key

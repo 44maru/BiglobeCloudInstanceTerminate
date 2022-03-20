@@ -31,15 +31,39 @@ STATE_PENDING = "pending"
 STATE_STOPPED = "stopped"
 
 PARAM = {"Actions": "DescribeInstances",
-         "AccessKeyId": "LzT4AFdPPid0Mg7tztxP",
          "SignatureMethod": "HmacSHA1",
          "SignatureVersion": "2",
          "Version": "1.0"
          }
 
 KEY_ACTION = "Action"
+KEY_ACCESS_KEY_ID = "AccessKeyId"
 KEY_INST_ID_1 = "InstanceId.1"
 KEY_SIGNATURE = "Signature"
+
+
+class Config:
+    __instance = None
+
+    @staticmethod 
+    def getInstance():
+       if Config.__instance == None:
+          Config()
+       return Config.__instance
+
+    def __init__(self):
+         Config.__instance = self
+         self.inifile = configparser.ConfigParser()
+         self.inifile.read('config.txt')
+
+    def getMaxThreadNum(self):
+        return self.inifile.getint('common', 'thread_num')
+
+    def getAccessKeyId(self):
+        return self.inifile.get('account', 'access_key_id')
+
+    def getAccessKey(self):
+        return self.inifile.get('account', 'access_key')
 
 
 def mk_signature(param):
@@ -49,11 +73,11 @@ def mk_signature(param):
 
     qstring = qstring[:-1]
 
-    accessKey = "4vuXVmaYbHFUX737FJhYZL7IBPRpF0K6h4V1OrqP"
+    config = Config.getInstance()
 
     string2sign = "GET\napi.cloudhosting.biglobe.ne.jp\n/api/\n{}".format(
         qstring)
-    return base64.b64encode(hmac.new(bytes(accessKey, 'utf-8'), bytes(
+    return base64.b64encode(hmac.new(bytes(config.getAccessKey(), 'utf-8'), bytes(
         string2sign, 'utf-8'), hashlib.sha1).digest()).decode()
 
 
@@ -104,10 +128,9 @@ def retErrInfo(errCode, instId):
             log.warn("インスタンスID={}が存在しません。".format(instId))
     else:
         if instId is None:
-            log.warn("インスタンスの情報取得でエラーが発生しました。")
+            log.error("インスタンスの情報取得でエラーが発生しました。")
         else:
-            log.warn("インスタンスID={}の情報取得でエラーが発生しました。".format(instId))
-        log.warn(ret.text)
+            log.error("インスタンスID={}の情報取得でエラーが発生しました。".format(instId))
 
     return []
 
@@ -188,16 +211,10 @@ def dispSuccessCnt(allCnt, ret):
     log.info("インスタンス数={} 削除成功数={}".format(allCnt, successCnt))
 
 
-def getMaxThreadNum():
-    inifile = configparser.ConfigParser()
-    inifile.read('config.txt')
-    maxThreadNum = inifile.getint('common', 'thread_num')
-    return maxThreadNum
-
-
 def main():
     try:
-        maxThreadNum = getMaxThreadNum()
+        config = Config.getInstance()
+        PARAM[KEY_ACCESS_KEY_ID] = config.getAccessKeyId()
 
         log.info("停止対象インスタンス情報の取得・・・")
         if len(sys.argv) == 2:
@@ -211,7 +228,7 @@ def main():
 
         confirmExecute(instIdList)
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=maxThreadNum) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=config.getMaxThreadNum()) as executor:
             ret = executor.map(terminateInst, instIdList)
 
         dispSuccessCnt(len(instIdList), ret)
