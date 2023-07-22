@@ -7,7 +7,7 @@ verify_ssl = true
 
 [packages]
 requests = "==2.27.1"
-pyinstaller = "==3.4"
+pyinstaller = "==3.6"
 
 [requires]
 python_version = "3.6"
